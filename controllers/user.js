@@ -19,8 +19,8 @@ var controller = {
             var validator_email = !validator.isEmpty(params.email) && validator.isEmail(params.email);
             var validator_password = !validator.isEmpty(params.password);
         }catch(err){
-            return res.status(500).send({
-                message: 'Faltan datos'
+            return res.status(200).send({
+                message: 'Faltan datos por enviar'
             }); 
         }
         //console.log(validator_name, validator_surname, validator_email, validator_password);
