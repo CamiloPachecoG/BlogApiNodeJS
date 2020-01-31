@@ -29,6 +29,7 @@ var controller = {
             topic.content = params.content;
             topic.code = params.code;
             topic.lang = params.lang;
+            topic.user = req.user.sub;
         
             //Guardar
             topic.save((err, topicStored) => {
@@ -56,15 +57,43 @@ var controller = {
     },
 
     getTopics: function(req, res){
-        //Cargar libreria de paginación
+        //Cargar libreria de paginación -> Models/topic.js
         //Recoger la pagina actual
-        //Indicar la opciones de paginación
-        //Find Paginado
-        //Devolver resultado (topics, totalTopics, totalPaginas)
+        if(!req.params.page || req.params.page == 0 || req.params.page == "0" || req.params.page == null || req.params.page == undefined){
+            var page = 1;
+        }else{
+            var page = parseInt(req.params.page);
+        }
 
-        return res.status(200).send({
-            message: 'Metodo obtener topics'
-        });
+        //Indicar la opciones de paginación
+        var option = {
+            sort: { date: -1},
+            populate: 'user',
+            limit: 5,
+            page: page
+        }
+        //Find Paginado
+        Topic.paginate({}, option, (err, topics) => {
+            if(err){
+                return res.status(500).send({
+                    status: 'error',
+                    message: 'Error al hacer la consulta'  
+                });
+            }
+            if(!topics){
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No hay Topics'  
+                });
+            }
+            //Devolver resultado (topics, totalTopics, totalPaginas)
+            return res.status(200).send({
+                status: 'sucess',
+                topics: topics.docs,
+                totalDocs: topics.totalDocs,
+                totalPages: topics.totalPages
+            });
+        })
     }
 };
 
