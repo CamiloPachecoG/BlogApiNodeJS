@@ -94,6 +94,72 @@ var controller = {
                 totalPages: topics.totalPages
             });
         })
+    },
+
+    getTopicsByUser: function(req, res){
+        //Conseguir el ID del usuario
+        var userId = req.params.user;
+
+        //Hacer una find con el User
+        Topic.find({
+            user: userId
+        })
+        .sort([['date', 'descending']])
+        .exec((err, topics) => {
+            if(err){
+                //Devolver resultado
+                return res.status(500).send({
+                    status: 'error',
+                    message: 'Error en la petición'
+                });
+            }
+
+            if(!topics){
+                //Devolver resultado
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No hay temas para mostrar'
+                });
+            }
+
+            //Devolver resultado
+            return res.status(200).send({
+                status: 'success',
+                topics
+            });
+        });
+    },
+
+    getTopic: function(req, res){
+        //Sacar el id del topic de la url
+        var topicId = req.params.id;
+
+        //Find por id del topic
+        Topic.findById(topicId)
+             .populate('user')
+             .exec((err, topic) => {
+                if(err){
+                    //Devolver resultado
+                    return res.status(500).send({
+                        status: 'error',
+                        message: 'Error en la petición'
+                    });
+                }
+
+                if(!topic){
+                    //Devolver resultado
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'El tema no existe'
+                    });
+                }
+
+                //Devolver resultado
+                return res.status(200).send({
+                    status: 'success',
+                    topic
+                });
+             }); 
     }
 };
 
